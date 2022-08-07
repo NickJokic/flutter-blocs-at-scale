@@ -1,12 +1,14 @@
 import 'package:blocs_at_scale/src/blocs/index.dart';
-import 'package:blocs_at_scale/src/screens/home/components/home_screen_user_section.dart';
+import 'package:blocs_at_scale/src/config/routing/app_route_name.dart';
+import 'package:blocs_at_scale/src/config/theme/app_constants.dart';
+import 'package:blocs_at_scale/src/models/product_model.dart';
+import 'package:blocs_at_scale/src/screens/home/components/home_screen_heading.dart';
+import 'package:blocs_at_scale/src/screens/home/components/product_card/home_screen_product_card.dart';
 import 'package:blocs_at_scale/src/screens/home/home_scaffold.dart';
-import 'package:blocs_at_scale/src/utility_widgets/dialogs/fullscreen_loading_dialog.dart';
+import 'package:blocs_at_scale/src/utility_widgets/misc/bottom_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-const _kSnackBarDuration = Duration(milliseconds: 3000);
-const _kSnackBarPadding = EdgeInsets.symmetric(horizontal: 32, vertical: 16);
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,77 +18,67 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late String text;
-  bool isDialogOpen = false;
+  @override
+  void initState() {
+    context.read<ProductBloc>().add(FetchRemoteData());
+    context.read<UserBlocV2>().add(FetchRemoteData());
+    context.read<CartBloc>().add(InitializeCart());
+    super.initState();
+  }
+
+  void _onCartCTAPressed(BuildContext context) => Navigator.of(context).pushNamed(AppRouteName.cart);
 
   @override
   Widget build(BuildContext context) {
     return HomeScaffold(
-      child: BlocListener<UserBloc, UserState>(
-        listener: (context, state) {
-          if (state is UserFetching) {
-            _showLoadingDialog(context);
-          } else if (state is UserError) {
-            _showErrorSnackbar(context);
-          } else if (state is UserRefetchingSuccess) {
-            _showSuccessSnackbar(context);
-          } else if (state is UserLoaded || state is UserUninitialized) {
-            _hideLoadingDialog(context);
-          }
-        },
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-            child: Column(
-              children: const [
-                HomeScreenUserSection(),
-              ],
-            ),
+      onCartCTAPressed: () => _onCartCTAPressed(context),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.kAppMargin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Heading
+              const HomeScreenHeading(),
+
+              // Product Card List
+              BlocBuilder<ProductBloc, RemoteDataState<List<Product>>>(
+                builder: (context, productState) {
+                  List<Product?> _productList = [null, null, null, null, null, null];
+
+                  if (productState is RemoteDataInitialized) {
+                    _productList = (productState as RemoteDataInitialized).data;
+                  }
+
+                  return MasonryGridView.builder(
+                    itemCount: _productList.length,
+                    gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                    mainAxisSpacing: 44,
+                    crossAxisSpacing: AppConstants.kAppMargin,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) => BlocBuilder<CartBloc, CartState>(
+                      builder: (context, cartState) {
+                        final int _productQuantity = cartState is CartInitialized && _productList[index] != null
+                            ? cartState.storage.getProductQuantity(_productList[index]!.id)
+                            : 0;
+                        return HomeScreenProductCard(
+                          quantity: _productQuantity,
+                          product: _productList[index],
+                          index: index,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+
+              const BottomSpacer(),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  void _showSuccessSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        padding: _kSnackBarPadding,
-        content: Text('User data has been refetched successfully.'),
-        duration: _kSnackBarDuration,
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  void _showErrorSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        padding: _kSnackBarPadding,
-        content: Text('An error has ocurred. Please check your connection and try again.'),
-        duration: _kSnackBarDuration,
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _showLoadingDialog(BuildContext context) async {
-    assert(isDialogOpen == false, 'Tried to show loading dialog which might already be shown.');
-
-    setState(() => isDialogOpen = true);
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const FullscreenLoadingDialog(),
-    );
-    setState(() => isDialogOpen = false);
-  }
-
-  void _hideLoadingDialog(BuildContext context) {
-    assert(isDialogOpen == true, 'Tried to pop loading dialog which might already be popped.');
-    Navigator.of(context).maybePop();
   }
 }
