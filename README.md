@@ -1,19 +1,23 @@
-# Flutter: BLOCs at Scale | 1 — The State Machine
+# Flutter: BLOCs at Scale
 
-Welcome to the Part 1 of the accompanying Flutter repository of the **"BLOCs at Scale" Medium series**.
+Welcome to the accompanying Flutter repository of the [**"BLOCs at Scale" Medium series**](https://itnext.io/flutter-blocs-at-scale-1-the-state-machine-fce5f086d7b9).
 
-This branch holds the example of a UserBloc, which utilizes all the principles
-that were described in the corresponding article.
+![Github Cover](https://user-images.githubusercontent.com/7860213/183299396-bfba5d7f-149f-4e11-8f00-867806a67320.jpg)
+
+This branch holds the full example of the app, which utilizes all the principles
+that were described in the corresponding articles of the [**"BLOCs at Scale" Medium series**](https://itnext.io/flutter-blocs-at-scale-1-the-state-machine-fce5f086d7b9).
+
+## App Showcase
+
+https://user-images.githubusercontent.com/7860213/183299230-466ad31b-2244-4ed8-a08c-c946d56ee73b.mov
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+**Note:** This project has been currently only tested on iOS 14+ devices.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Setup Steps
+1. Install Flutter
+2. Install pub packages by running `flutter pub get`
+3. Open the iOS Simulator
+4. Run by typing `flutter run`
