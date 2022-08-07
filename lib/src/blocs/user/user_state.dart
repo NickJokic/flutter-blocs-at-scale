@@ -12,9 +12,9 @@ mixin UserError on UserState {}
 /// Mixin for every [UserState] that represents an temporary success.
 mixin UserSuccess on UserState {}
 
-/// ####################
-/// Uninitialized States
-/// ####################
+// ####################
+// Uninitialized States
+// ####################
 
 class UserUninitialized extends UserState {}
 
@@ -28,9 +28,9 @@ class UserInitialFetchingError extends UserState with UserError {
   List<Object?> get props => [...super.props, error];
 }
 
-/// ##################
-/// Initialized States
-/// ##################
+// ##################
+// Initialized States
+// ##################
 
 abstract class UserInitialized extends UserState {
   final User user;
@@ -52,9 +52,7 @@ class UserRefetching extends UserInitialized with UserFetching {
 }
 
 class UserRefetchingSuccess extends UserInitialized with UserSuccess {
-  UserRefetchingSuccess({
-    required User user,
-  }) : super(user: user);
+  UserRefetchingSuccess({required User user}) : super(user: user);
 }
 
 class UserRefetchingError extends UserInitialized with UserError {
