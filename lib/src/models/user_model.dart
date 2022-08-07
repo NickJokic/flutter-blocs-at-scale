@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
+import 'package:blocs_at_scale/src/util/models/data_type.dart';
 
-class User extends Equatable {
+class User extends DataType {
   final int userId;
   final String userEmail;
   final String username;
