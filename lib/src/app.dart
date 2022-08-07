@@ -1,5 +1,6 @@
+import 'package:blocs_at_scale/src/config/routing/app_navigator.dart';
+import 'package:blocs_at_scale/src/config/routing/app_route_name.dart';
 import 'package:flutter/material.dart';
-import 'package:blocs_at_scale/src/screens/home/home_screen.dart';
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -9,7 +10,8 @@ class App extends StatelessWidget {
     return const MaterialApp(
       title: 'BLOCs at Scale (Part 1)',
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      onGenerateRoute: AppNavigator.generateRoute,
+      initialRoute: AppRouteName.appInit,
     );
   }
 }
